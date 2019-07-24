@@ -1,10 +1,14 @@
 #include "login_dialog.h"
 #include "db.h"
 #include "utilities.h"
+#include "mainwindow.h"
 
 LoginDialog::LoginDialog(QWidget *parent) :
     QDialog(parent)
 {
+
+    db = new Db();
+
     setUpGUI();
     setWindowTitle( tr("Распоряжения 1.0 | Авторизация") );
     setModal( true );
@@ -68,18 +72,26 @@ void LoginDialog::slotAcceptLogin(){
     QString password = editPassword->text();
 
     if (username.isEmpty()) {
-        ShowStylizedErrorMessage("Поле логина не может быть пустым");
+        ShowStylizedErrorMessage(tr("Поле логина не может быть пустым"));
         return;
     }
     else if (password.isEmpty()) {
-        ShowStylizedErrorMessage("Поле пароля не может быть пустым");
+        ShowStylizedErrorMessage(tr("Поле пароля не может быть пустым"));
         return;
     }
 
-    Db db;
-    if (!db.connect()) {
-        ShowStylizedErrorMessage("Не удалось соединиться с базой данных. Текст ошибки: " + db.lastError());
+    if (!db->connect()) {
+        ShowStylizedErrorMessage(tr("Не удалось соединиться с базой данных. Текст ошибки: ") + db->lastError());
         return;
+    }
+
+    if (!db->tryLogin(username, password)) {
+        ShowStylizedErrorMessage(tr("Неверные логин или пароль. Попробуйте еще раз."));
+        return;
+    }
+    else {
+        close();
+        new MainWindow(db);
     }
 }
 

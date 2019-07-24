@@ -9,13 +9,14 @@
 #include <QComboBox>
 #include <QGridLayout>
 #include <QStringList>
-#include <QDebug>
+#include "db.h"
 
 class LoginDialog : public QDialog
 {
     Q_OBJECT
 
 private:
+    Db * db;
     QLabel* labelUsername;
     QLabel* labelPassword;
 
@@ -36,6 +37,7 @@ public:
 
 signals:
     void acceptLogin( QString& username, QString& password );
+    void raiseUserLogged(User user);
 public slots:
     void slotAcceptLogin();
 };

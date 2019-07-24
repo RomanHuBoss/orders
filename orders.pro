@@ -27,11 +27,15 @@ CONFIG += c++11
 SOURCES += \
         db.cpp \
         login_dialog.cpp \
-        main.cpp
+        main.cpp \
+        mainwindow.cpp \
+        user.cpp
 
 HEADERS += \
     db.h \
     login_dialog.h \
+    mainwindow.h \
+    user.h \
     utilities.h
 
 FORMS +=
