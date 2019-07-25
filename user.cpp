@@ -1,12 +1,14 @@
 #include "user.h"
 
-User::User()
-{
+Q_DECLARE_METATYPE(UserPosition);
 
+User::User() :
+    id(0), position(UserPosition())
+{    
 }
 
-User::User(int id, const QString &fio, bool is_head, const QString &login) :
-    id(id), fio(fio), is_head(is_head), login(login)
+User::User(int id, const QString &fio, const QString &login, const UserPosition& position) :
+    id(id), fio(fio), login(login), position(position)
 {
 
 }
@@ -21,13 +23,14 @@ User::User(const QMap<QString, QVariant> props)
         fio = props["fio"].toString();
     }
 
-    if (props.contains("is_head")) {
-        is_head = props["is_head"].toBool();
-    }
-
     if (props.contains("login")) {
         login = props["login"].toString();
     }
+
+    if (props.contains("position")) {
+        position = props["position"].value<UserPosition>();
+    }
+
 }
 
 int User::getId() const
@@ -40,14 +43,13 @@ const QString &User::getFio() const
     return fio;
 }
 
-bool User::isHead() const
-{
-    return is_head;
-}
-
 const QString &User::getLogin() const
 {
     return login;
+}
+
+const UserPosition& User::getPosition() const {
+    return position;
 }
 
 const QString &User::getPassword() const
@@ -58,4 +60,9 @@ const QString &User::getPassword() const
 bool User::isValid() const
 {
     return id > 0;
+}
+
+bool User::isHead() const
+{
+    return position.isHead();
 }

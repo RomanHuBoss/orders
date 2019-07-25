@@ -3,6 +3,7 @@
 #include <QStringList>
 #include <QMessageBox>
 #include <QSqlQuery>
+#include "userposition.h"
 
 Db::Db()
 {
@@ -10,8 +11,8 @@ Db::Db()
     db.setHostName("127.0.0.1");
     db.setPort(5432);
     db.setDatabaseName("orders");
-    db.setUserName("admin");
-    db.setPassword("admin");
+    db.setUserName("postgres");
+    db.setPassword("postgres");
 }
 
 Db::~Db()
@@ -47,7 +48,9 @@ QString Db::lastError() const {
 User Db::getUserByLoginPassword(const QString &login, const QString &password)
 {
     QSqlQuery query;
-    query.prepare("SELECT * FROM department_workers WHERE login = :login AND password = md5(:password)");
+    query.prepare("SELECT w.*, p.id as id_position, p.title as position_title, p.description as position_description,"
+                  "p.is_head as  is_head FROM department_workers as w LEFT JOIN positions as p ON p.id = w.id_position  "
+                  "WHERE w.login = :login AND w.password = md5(:password)");
     query.bindValue(":login", login);
     query.bindValue(":password", password);
     query.exec();
@@ -58,9 +61,15 @@ User Db::getUserByLoginPassword(const QString &login, const QString &password)
 
     query.first();
 
+    UserPosition position(query.value("id_position").toInt(),
+                          query.value("position_title").toString(),
+                          query.value("position_description").toString(),
+                          query.value("is_head").toBool()
+                          );
+
     return User(query.value("id").toInt(),
                 query.value("fio").toString(),
-                query.value("is_head").toBool(),
-                login
-                );
+                login,
+                position
+    );
 }

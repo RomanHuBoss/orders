@@ -29,13 +29,15 @@ SOURCES += \
         login_dialog.cpp \
         main.cpp \
         mainwindow.cpp \
-        user.cpp
+        user.cpp \
+        userposition.cpp
 
 HEADERS += \
     db.h \
     login_dialog.h \
     mainwindow.h \
     user.h \
+    userposition.h \
     utilities.h
 
 FORMS +=
