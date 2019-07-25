@@ -8,8 +8,8 @@
 
 void ShowStylizedErrorMessage(const QString& error) {
     QMessageBox messageBox;
-    messageBox.critical(0,"Ошибка", error);
-    messageBox.setWindowIcon(QIcon(QPixmap(":/Resources/error_icon.png")));
+    messageBox.critical(nullptr, "Ошибка", error);
+    messageBox.setWindowIcon(QPixmap(":/Resources/error_icon.png"));
     messageBox.setFixedSize(500,200);
 }
 

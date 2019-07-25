@@ -6,6 +6,7 @@
 #include <QTableWidget>
 #include <QTreeWidget>
 #include "db.h"
+#include <QPushButton>
 
 class MainWindow : public QMainWindow
 {
@@ -16,6 +17,19 @@ private:
     QTableWidget * projectsTbl;
     QTreeWidget * tasksTree;
     QTreeWidget * commentsTree;
+
+    QPushButton * addProjectBtn;
+    QPushButton * removeProjectBtn;
+
+    QPushButton * editTaskBtn;
+    QPushButton * addTaskBtn;
+    QPushButton * addSubtaskBtn;
+    QPushButton * removeTaskBtn;
+
+    QPushButton * editCommentBtn;
+    QPushButton * addCommentBtn;
+    QPushButton * addSubcommentBtn;
+    QPushButton * removeCommentBtn;
 
 public:
     MainWindow(Db * db, QWidget * parent = 0);

@@ -6,5 +6,10 @@
         <file>Resources/report_icon.png</file>
         <file>Resources/users_icon.png</file>
         <file>Resources/status_sequence_icon.png</file>
+        <file>Resources/window_title_icon.png</file>
+        <file>Resources/add_object.png</file>
+        <file>Resources/remove_object.png</file>
+        <file>Resources/add_subobject.png</file>
+        <file>Resources/edit_object.png</file>
     </qresource>
 </RCC>
