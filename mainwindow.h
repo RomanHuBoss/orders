@@ -12,6 +12,7 @@ private:
     Db * db;
 public:
     MainWindow(Db * db, QWidget * parent = 0);
+    void setupGui();
     ~MainWindow();
 };
 
