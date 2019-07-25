@@ -16,6 +16,7 @@ public:
     bool tryLogin(const QString &login, const QString &password);
     QString lastError() const;
     User getUserByLoginPassword(const QString &login, const QString &password);
+    const User& getCurrentUser() const;
 };
 
 #endif // DB_H

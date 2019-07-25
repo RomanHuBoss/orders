@@ -24,6 +24,7 @@ public:
     const QString& getLogin() const;
     const QString& getPassword() const;
     bool isValid() const;
+    bool isHead() const;
 
 };
 

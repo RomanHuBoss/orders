@@ -71,5 +71,10 @@ User Db::getUserByLoginPassword(const QString &login, const QString &password)
                 query.value("fio").toString(),
                 login,
                 position
-    );
+                );
+}
+
+const User &Db::getCurrentUser() const
+{
+    return currentUser;
 }
