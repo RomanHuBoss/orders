@@ -5,7 +5,7 @@
 -- Dumped from database version 9.4.19
 -- Dumped by pg_dump version 9.6.0
 
--- Started on 2019-07-25 13:46:52
+-- Started on 2019-07-25 16:22:10
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -844,8 +844,9 @@ SELECT pg_catalog.setval('comments_id_seq', 1, false);
 --
 
 COPY department_workers (id, fio, login, password, id_position) FROM stdin;
-2	Начальник подразделения	admin	21232f297a57a5a743894a0e4a801fc3	1
-3	Иванов Иван Иванович	ivanov	4dfe6e220d16e7b633cfdd92bcc8050b	2
+2	Рабинович Р.М.	admin	21232f297a57a5a743894a0e4a801fc3	1
+3	Иванов И.И.	ivanov	4dfe6e220d16e7b633cfdd92bcc8050b	2
+4	Петров П.П.	petrov	f396c3b74762b1fee69b10abb875139b	2
 \.
 
 
@@ -855,7 +856,7 @@ COPY department_workers (id, fio, login, password, id_position) FROM stdin;
 -- Name: department_workers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('department_workers_id_seq', 3, true);
+SELECT pg_catalog.setval('department_workers_id_seq', 4, true);
 
 
 --
@@ -1186,7 +1187,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2019-07-25 13:46:54
+-- Completed on 2019-07-25 16:22:12
 
 --
 -- PostgreSQL database dump complete

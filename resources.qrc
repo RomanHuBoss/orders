@@ -2,5 +2,9 @@
     <qresource prefix="/">
         <file>Resources/lock_icon.png</file>
         <file>Resources/error_icon.png</file>
+        <file>Resources/about_icon.png</file>
+        <file>Resources/report_icon.png</file>
+        <file>Resources/users_icon.png</file>
+        <file>Resources/status_sequence_icon.png</file>
     </qresource>
 </RCC>
