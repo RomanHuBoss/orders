@@ -15,12 +15,12 @@ MainWindow::MainWindow(Db *db, QWidget * parent) :
     setWindowTitle(tr(title.toStdString().c_str()));
     setWindowIcon(QPixmap(":/Resources/window_title_icon.png"));
     setMinimumWidth(800);
-    setupGui();
+    setupGUI();
 
     showMaximized();
 }
 
-void MainWindow::setupGui()
+void MainWindow::setupGUI()
 {
     QToolBar* tb = new QToolBar(tr("Панель инструментов окна"));
     tb->addAction(QPixmap(":/Resources/report_icon.png"), tr("Отчет"), this, SLOT(slotNoImpl()));
@@ -45,8 +45,12 @@ void MainWindow::setupGui()
     projectsTbl->setHorizontalHeaderLabels(QStringList{tr("Название"), tr("Дата начала"), tr("Дата окончания")});
     projectsTbl->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     projectsTbl->horizontalHeader()->setStretchLastSection(true);
-    projectsTbl->setMinimumWidth(400);
-    projectsTbl->setMaximumWidth(400);
+
+    detailsProjectBtn = new QPushButton;
+    detailsProjectBtn->setIcon(QPixmap(":/Resources/show_object.png"));
+    detailsProjectBtn->setText(tr("Подробности"));
+    detailsProjectBtn->setFlat(true);
+    detailsProjectBtn->setIconSize(QSize{24, 24});
 
     addProjectBtn = new QPushButton;
     addProjectBtn->setIcon(QPixmap(":/Resources/add_object.png"));
@@ -54,16 +58,24 @@ void MainWindow::setupGui()
     addProjectBtn->setFlat(true);
     addProjectBtn->setIconSize(QSize{24, 24});
 
+    editProjectBtn = new QPushButton;
+    editProjectBtn->setIcon(QPixmap(":/Resources/add_object.png"));
+    editProjectBtn->setText(tr("Редактировать"));
+    editProjectBtn->setFlat(true);
+    editProjectBtn->setIconSize(QSize{24, 24});
+
     removeProjectBtn = new QPushButton;
     removeProjectBtn->setIcon(QPixmap(":/Resources/remove_object.png"));
-    removeProjectBtn->setText(tr("Удалить проект"));
+    removeProjectBtn->setText(tr("Удалить"));
     removeProjectBtn->setFlat(true);
     removeProjectBtn->setIconSize(QSize{24, 24});
 
     QHBoxLayout * projectsBtns = new QHBoxLayout;
-    projectsBtns->addWidget(addProjectBtn);
-    projectsBtns->addWidget(removeProjectBtn);
     projectsBtns->addStretch(1);
+    projectsBtns->addWidget(detailsProjectBtn);
+    projectsBtns->addWidget(addProjectBtn);
+    projectsBtns->addWidget(editProjectBtn);
+    projectsBtns->addWidget(removeProjectBtn);
 
     QGroupBox * projectsGroup  = new QGroupBox(tr("Проекты"));
     QVBoxLayout * projectsLayout = new QVBoxLayout;
@@ -71,9 +83,7 @@ void MainWindow::setupGui()
     projectsLayout->addWidget(projectsTbl);
     projectsLayout->addLayout(projectsBtns);
 
-    projectsGroup->setMinimumWidth(400);
-    projectsGroup->setMaximumWidth(400);
-
+    projectsGroup->setMinimumWidth(500);
 
     mainLayout->addWidget(projectsGroup);
 
@@ -86,11 +96,11 @@ void MainWindow::setupGui()
     tasksTree->header()->setSectionResizeMode(QHeaderView::Stretch);
     tasksTree->header()->setStretchLastSection(true);
 
-    editTaskBtn = new QPushButton;
-    editTaskBtn->setIcon(QPixmap(":/Resources/edit_object.png"));
-    editTaskBtn->setText(tr("Редактировать"));
-    editTaskBtn->setFlat(true);
-    editTaskBtn->setIconSize(QSize{24, 24});
+    detailsTaskBtn = new QPushButton;
+    detailsTaskBtn->setIcon(QPixmap(":/Resources/show_object.png"));
+    detailsTaskBtn->setText(tr("Подробности"));
+    detailsTaskBtn->setFlat(true);
+    detailsTaskBtn->setIconSize(QSize{24, 24});
 
     addTaskBtn = new QPushButton;
     addTaskBtn->setIcon(QPixmap(":/Resources/add_object.png"));
@@ -104,6 +114,12 @@ void MainWindow::setupGui()
     addSubtaskBtn->setFlat(true);
     addSubtaskBtn->setIconSize(QSize{24, 24});
 
+    editTaskBtn = new QPushButton;
+    editTaskBtn->setIcon(QPixmap(":/Resources/edit_object.png"));
+    editTaskBtn->setText(tr("Редактировать"));
+    editTaskBtn->setFlat(true);
+    editTaskBtn->setIconSize(QSize{24, 24});
+
     removeTaskBtn = new QPushButton;
     removeTaskBtn->setIcon(QPixmap(":/Resources/remove_object.png"));
     removeTaskBtn->setText(tr("Удалить"));
@@ -111,11 +127,12 @@ void MainWindow::setupGui()
     removeTaskBtn->setIconSize(QSize{24, 24});
 
     QHBoxLayout * tasksTreeBtns = new QHBoxLayout;
-    tasksTreeBtns->addWidget(editTaskBtn);
+    tasksTreeBtns->addStretch(1);
+    tasksTreeBtns->addWidget(detailsTaskBtn);
     tasksTreeBtns->addWidget(addTaskBtn);
     tasksTreeBtns->addWidget(addSubtaskBtn);
+    tasksTreeBtns->addWidget(editTaskBtn);
     tasksTreeBtns->addWidget(removeTaskBtn);
-    tasksTreeBtns->addStretch(1);
 
     QGroupBox * tasksGroup = new QGroupBox;
     tasksGroup->setTitle(tr("Задачи проекта"));
@@ -132,6 +149,13 @@ void MainWindow::setupGui()
     commentsTree->header()->setSectionResizeMode(QHeaderView::Stretch);
     commentsTree->header()->setStretchLastSection(true);
 
+
+    detailsCommentBtn = new QPushButton;
+    detailsCommentBtn->setIcon(QPixmap(":/Resources/show_object.png"));
+    detailsCommentBtn->setText(tr("Подробности"));
+    detailsCommentBtn->setFlat(true);
+    detailsCommentBtn->setIconSize(QSize{24, 24});
+
     addCommentBtn = new QPushButton;
     addCommentBtn->setIcon(QPixmap(":/Resources/add_object.png"));
     addCommentBtn->setText(tr("Добавить комментарий"));
@@ -144,10 +168,25 @@ void MainWindow::setupGui()
     addSubcommentBtn->setFlat(true);
     addSubcommentBtn->setIconSize(QSize{24, 24});
 
+    editCommentBtn = new QPushButton;
+    editCommentBtn->setIcon(QPixmap(":/Resources/edit_object.png"));
+    editCommentBtn->setText(tr("Редактировать"));
+    editCommentBtn->setFlat(true);
+    editCommentBtn->setIconSize(QSize{24, 24});
+
+    removeCommentBtn = new QPushButton;
+    removeCommentBtn->setIcon(QPixmap(":/Resources/remove_object.png"));
+    removeCommentBtn->setText(tr("Удалить"));
+    removeCommentBtn->setFlat(true);
+    removeCommentBtn->setIconSize(QSize{24, 24});
+
     QHBoxLayout * commentsTreeBtns = new QHBoxLayout;
+    commentsTreeBtns->addStretch(1);
+    commentsTreeBtns->addWidget(detailsCommentBtn);
     commentsTreeBtns->addWidget(addCommentBtn);
     commentsTreeBtns->addWidget(addSubcommentBtn);
-    commentsTreeBtns->addStretch(1);
+    commentsTreeBtns->addWidget(editCommentBtn);
+    commentsTreeBtns->addWidget(removeCommentBtn);
 
     QGroupBox * commentsGroup = new QGroupBox;
     commentsGroup->setTitle(tr("Комментарии к задаче"));

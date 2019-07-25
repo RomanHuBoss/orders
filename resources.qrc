@@ -11,5 +11,6 @@
         <file>Resources/remove_object.png</file>
         <file>Resources/add_subobject.png</file>
         <file>Resources/edit_object.png</file>
+        <file>Resources/show_object.png</file>
     </qresource>
 </RCC>
