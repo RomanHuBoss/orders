@@ -18,6 +18,20 @@ MainWindow::MainWindow(Db *db, QWidget * parent) :
     setupGUI();
 
     showMaximized();
+
+    //заполнить список проектов
+    fillProjectsTable();
+}
+
+void MainWindow::fillProjectsTable() {
+    QVector<QMap<QString, QVariant>> projectsData = db->getProjectsData();
+
+    for (auto row : projectsData) {
+        projectsTbl->insertRow(projectsTbl->rowCount());
+        projectsTbl->setItem( projectsTbl->rowCount() - 1, 0, new QTableWidgetItem(row["title"].toString()));
+        projectsTbl->setItem( projectsTbl->rowCount() - 1, 1, new QTableWidgetItem(row["title"].toString()));
+        projectsTbl->setItem( projectsTbl->rowCount() - 1, 2, new QTableWidgetItem(row["title"].toString()));
+    }
 }
 
 void MainWindow::setupGUI()
@@ -59,7 +73,7 @@ void MainWindow::setupGUI()
     addProjectBtn->setIconSize(QSize{24, 24});
 
     editProjectBtn = new QPushButton;
-    editProjectBtn->setIcon(QPixmap(":/Resources/add_object.png"));
+    editProjectBtn->setIcon(QPixmap(":/Resources/edit_object.png"));
     editProjectBtn->setText(tr("Редактировать"));
     editProjectBtn->setFlat(true);
     editProjectBtn->setIconSize(QSize{24, 24});
@@ -145,7 +159,7 @@ void MainWindow::setupGUI()
 
     commentsTree = new QTreeWidget;
     commentsTree->setColumnCount(3);
-    commentsTree->setHeaderLabels(QStringList{tr("Дата"), tr("Автор"), tr("Содержание")});
+    commentsTree->setHeaderLabels(QStringList{tr("Тема комментария"), tr("Автор"), tr("Дата создания")});
     commentsTree->header()->setSectionResizeMode(QHeaderView::Stretch);
     commentsTree->header()->setStretchLastSection(true);
 

@@ -78,3 +78,29 @@ const User &Db::getCurrentUser() const
 {
     return currentUser;
 }
+
+QVector<QMap<QString, QVariant>> Db::getProjectsData() const
+{
+    QVector<QMap<QString, QVariant>> result;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM projects ORDER BY start_date, title");
+    query.exec();
+
+    if (query.size() == 0) {
+        return result;
+    }
+
+    while (query.next()) {
+        QMap<QString, QVariant> row;
+        row["id"] = query.value("id");
+        row["title"] = query.value("title");
+        row["description"] = query.value("description");
+        row["creation_dt"] = query.value("cration_dt");
+        row["start_date"] = query.value("start_date");
+        row["end_date"] = query.value("end_date");
+        result.push_back(row);
+    }
+
+    return result;
+}

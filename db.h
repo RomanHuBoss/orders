@@ -17,6 +17,7 @@ public:
     QString lastError() const;
     User getUserByLoginPassword(const QString &login, const QString &password);
     const User& getCurrentUser() const;
+    QVector<QMap<QString, QVariant>> getProjectsData() const;
 };
 
 #endif // DB_H

@@ -39,6 +39,8 @@ public:
     MainWindow(Db * db, QWidget * parent = nullptr);
     void setupGUI();
     ~MainWindow();
+protected:
+    void fillProjectsTable();
 };
 
 #endif // MAINWINDOW_H
