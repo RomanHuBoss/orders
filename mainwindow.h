@@ -42,7 +42,13 @@ public:
 private slots:
     void onSelectProject();
     void onShowProjectDetailsDialog();
+    void onShowProjectAddDialog();
+    void onShowProjectEditDialog();
+    void onRemoveProject();
+
     void onSelectTask();
+    void onRefreshProjectsTbl();
+
 protected:
     void fillProjectsTable();
     void fillTasksTree(const Rows& tasksData);

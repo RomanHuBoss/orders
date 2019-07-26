@@ -22,6 +22,9 @@ public:
     Rows getProjectsData() const;
     Rows getTasksData(int id_project) const;
     Rows getCommentsData(int id_task) const;
+
+    bool saveProjectData(const RowData& row, DIALOG_ACTIONS action) const;
+    bool removeProject(const RowData& row) const;
 };
 
 #endif // DB_H

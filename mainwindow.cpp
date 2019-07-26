@@ -7,14 +7,13 @@
 #include <QGroupBox>
 #include <QHeaderView>
 #include <QButtonGroup>
-#include "projectdetailsdialog.h"
+#include "projectdialog.h"
 
 MainWindow::MainWindow(Db *db, QWidget * parent) :
     QMainWindow(parent), db(db)
 {
     QString title = "Программа \"Распоряжения\" | " + db->getCurrentUser().getFio() + " (" + db->getCurrentUser().getPosition().getTitle() + ")";
     setWindowTitle(tr(title.toStdString().c_str()));
-    setWindowIcon(QPixmap(":/Resources/window_title_icon.png"));
     setMinimumWidth(800);
     setupGUI();
 
@@ -25,7 +24,10 @@ MainWindow::MainWindow(Db *db, QWidget * parent) :
 }
 
 void MainWindow::fillProjectsTable() {
-    projectsTbl->clear();
+    projectsTbl->blockSignals(true);
+    while (projectsTbl->rowCount() > 0) {
+        projectsTbl->removeRow(projectsTbl->rowCount() - 1);
+    }
 
     Rows projectsData = db->getProjectsData();
 
@@ -35,6 +37,12 @@ void MainWindow::fillProjectsTable() {
         projectsTbl->setItem( projectsTbl->rowCount() - 1, 1, new QTableWidgetItem(row["start_date"].toString()));
         projectsTbl->setItem( projectsTbl->rowCount() - 1, 2, new QTableWidgetItem(row["end_date"].toString()));
         projectsTbl->item(projectsTbl->rowCount() - 1, 0)->setData(Qt::UserRole, row);
+    }
+
+    projectsTbl->blockSignals(false);
+
+    if (projectsTbl->rowCount() > 0) {
+        projectsTbl->selectRow(0);
     }
 }
 
@@ -103,8 +111,9 @@ void MainWindow::setupGUI()
     addProjectBtn->setIconSize(QSize{24, 24});
     addProjectBtn->setDisabled(true);
 
+    connect(addProjectBtn, SIGNAL(clicked()), this, SLOT(onShowProjectAddDialog()));
     if (db->getCurrentUser().isHead()) {
-        addProjectBtn->setDisabled(false);
+        addProjectBtn->setDisabled(false);        
     }
 
     editProjectBtn = new QPushButton;
@@ -114,12 +123,16 @@ void MainWindow::setupGUI()
     editProjectBtn->setIconSize(QSize{24, 24});
     editProjectBtn->setDisabled(true);
 
+    connect(editProjectBtn, SIGNAL(clicked()), this, SLOT(onShowProjectEditDialog()));
+
     removeProjectBtn = new QPushButton;
     removeProjectBtn->setIcon(QPixmap(":/Resources/remove_object.png"));
     removeProjectBtn->setText(tr("Удалить"));
     removeProjectBtn->setFlat(true);
     removeProjectBtn->setIconSize(QSize{24, 24});
     removeProjectBtn->setDisabled(true);
+
+    connect(removeProjectBtn, SIGNAL(clicked()), this, SLOT(onRemoveProject()));
 
     QHBoxLayout * projectsBtns = new QHBoxLayout;
     projectsBtns->addStretch(1);
@@ -275,6 +288,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::onSelectProject()
 {
+    qDebug() << "current row:" << projectsTbl->currentRow();
+    qDebug() << "row count:" << projectsTbl->rowCount();
     detailsProjectBtn->setDisabled(false);
     addProjectBtn->setDisabled(!db->getCurrentUser().isHead());
     editProjectBtn->setDisabled(!db->getCurrentUser().isHead());
@@ -287,7 +302,7 @@ void MainWindow::onSelectProject()
     Rows tasksData = db->getTasksData(id_project);
 
     if (tasksData.size() > 0) {
-        fillTasksTree(tasksData);
+        //fillTasksTree(tasksData);
     }
 }
 
@@ -295,7 +310,34 @@ void MainWindow::onShowProjectDetailsDialog()
 {
     RowData row = qvariant_cast<RowData>(projectsTbl->item(projectsTbl->currentRow(), 0)->data(Qt::UserRole));
 
-    ProjectDetailsDialog(row).exec();
+    ProjectDialog pd(row, SHOW, db);
+    pd.exec();
+
+}
+
+void MainWindow::onShowProjectAddDialog()
+{
+    ProjectDialog pd(RowData(), ADD, db);
+    connect(&pd, SIGNAL(raiseDataChanged()), this, SLOT(onRefreshProjectsTbl()));
+    pd.exec();
+
+}
+
+void MainWindow::onShowProjectEditDialog()
+{
+    RowData row = qvariant_cast<RowData>(projectsTbl->item(projectsTbl->currentRow(), 0)->data(Qt::UserRole));
+    ProjectDialog pd(row, EDIT, db);
+    connect(&pd, SIGNAL(raiseDataChanged()), this, SLOT(onRefreshProjectsTbl()));
+    pd.exec();
+
+}
+
+void MainWindow::onRemoveProject()
+{
+    RowData row = qvariant_cast<RowData>(projectsTbl->item(projectsTbl->currentRow(), 0)->data(Qt::UserRole));
+    if (db->removeProject(row)) {
+        fillProjectsTable();
+    }
 }
 
 void MainWindow::onSelectTask()
@@ -309,4 +351,9 @@ void MainWindow::onSelectTask()
     int id_task = row["id"].toInt();
 
     Rows commentsData = db->getCommentsData(id_task);
+}
+
+void MainWindow::onRefreshProjectsTbl()
+{
+    fillProjectsTable();
 }

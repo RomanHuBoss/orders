@@ -3,10 +3,13 @@
 
 void ShowStylizedErrorMessage(const QString& error) {
     QMessageBox messageBox;
-    messageBox.setWindowIcon(QPixmap(":/Resources/error_icon.png"));
-    messageBox.setWindowTitle("Ошибка");
-    messageBox.setText(error);
-    messageBox.setFixedSize(500,200);
+    messageBox.critical(nullptr, "Ошибка", error);
     messageBox.setModal(true);
-    messageBox.exec();
+}
+
+void ShowStylizedInfoMessage(const QString &info)
+{
+    QMessageBox messageBox;
+    messageBox.information(nullptr, "Уведомление", info);
+    messageBox.setModal(true);
 }

@@ -151,3 +151,48 @@ Rows Db::getCommentsData(int id_task) const
 
     return result;
 }
+
+bool Db::saveProjectData(const RowData &row, DIALOG_ACTIONS action) const
+{
+    QSqlQuery query;
+    if (action == ADD) {
+        query.prepare("INSERT INTO projects (title, description, start_date, end_date) VALUES (:title, :description, :start_date, :end_date) ");
+        query.bindValue(":title", row["title"].toString());
+        query.bindValue(":description", row["description"].toDate());
+        query.bindValue(":start_date", row["start_date"].toDate());
+        query.bindValue(":end_date", row["end_date"].toString());
+    }
+    else { // action == EDIT
+        query.prepare("UPDATE projects SET title = :title, description = :description, start_date = :start_date, end_date = :end_date WHERE id = :id");
+        query.bindValue(":title", row["title"].toString());
+        query.bindValue(":description", row["description"].toString());
+        query.bindValue(":start_date", row["start_date"].toDate());
+        query.bindValue(":end_date", row["end_date"].toDate());
+        query.bindValue(":id", row["id"].toInt());
+    }
+
+    if (query.exec()) {
+        ShowStylizedInfoMessage("Данные успешно сохранены");
+        return true;
+    }
+
+
+    ShowStylizedErrorMessage("Ошибка сохранения данных");
+    return false;
+}
+
+bool Db::removeProject(const RowData &row) const
+{
+    QSqlQuery query;
+    query.prepare("DELETE FROM projects WHERE id = :id");
+    query.bindValue(":id", row["id"].toInt());
+
+    if (query.exec()) {
+        ShowStylizedInfoMessage("Проект успешно удален");
+        return true;
+    }
+
+    ShowStylizedErrorMessage("Ошибка удаления проекта");
+    return false;
+
+}

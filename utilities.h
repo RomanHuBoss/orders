@@ -12,5 +12,8 @@ typedef QMap<QString, QVariant> RowData;
 typedef QVector<RowData> Rows;
 
 void ShowStylizedErrorMessage(const QString& error);
+void ShowStylizedInfoMessage(const QString& info);
+
+enum DIALOG_ACTIONS {SHOW, ADD, EDIT};
 
 #endif // UTILITIES_H

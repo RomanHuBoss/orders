@@ -13,7 +13,6 @@ LoginDialog::LoginDialog(QWidget *parent) :
     setWindowTitle( tr("Распоряжения 1.0 | Авторизация") );
     setModal( true );
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setWindowIcon(QPixmap(":/Resources/lock_icon.png"));
     resize(270, 120);
 }
 

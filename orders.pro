@@ -29,7 +29,7 @@ SOURCES += \
         login_dialog.cpp \
         main.cpp \
         mainwindow.cpp \
-        projectdetailsdialog.cpp \
+        projectdialog.cpp \
         user.cpp \
         userposition.cpp \
         utilities.cpp
@@ -38,7 +38,7 @@ HEADERS += \
     db.h \
     login_dialog.h \
     mainwindow.h \
-    projectdetailsdialog.h \
+    projectdialog.h \
     user.h \
     userposition.h \
     utilities.h
@@ -49,6 +49,8 @@ FORMS +=
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RC_ICONS = .\Resources\myappico.ico
 
 DISTFILES +=
 
