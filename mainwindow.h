@@ -39,8 +39,14 @@ public:
     MainWindow(Db * db, QWidget * parent = nullptr);
     void setupGUI();
     ~MainWindow();
+private slots:
+    void onSelectProject();
+    void onShowProjectDetailsDialog();
+    void onSelectTask();
 protected:
     void fillProjectsTable();
+    void fillTasksTree(const Rows& tasksData);
+    void fillCommentsTree(const Rows &commentsData);
 };
 
 #endif // MAINWINDOW_H

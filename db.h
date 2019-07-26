@@ -4,6 +4,8 @@
 #include <QtSql>
 #include <QSqlDatabase>
 #include "user.h"
+#include "utilities.h"
+
 
 class Db
 {
@@ -17,7 +19,9 @@ public:
     QString lastError() const;
     User getUserByLoginPassword(const QString &login, const QString &password);
     const User& getCurrentUser() const;
-    QVector<QMap<QString, QVariant>> getProjectsData() const;
+    Rows getProjectsData() const;
+    Rows getTasksData(int id_project) const;
+    Rows getCommentsData(int id_task) const;
 };
 
 #endif // DB_H

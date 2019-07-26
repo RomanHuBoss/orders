@@ -5,15 +5,12 @@
 #include <QString>
 #include <QMessageBox>
 #include <QIcon>
+#include <QMap>
+#include <QVariant>
 
-void ShowStylizedErrorMessage(const QString& error) {
-    QMessageBox messageBox;
-    messageBox.setWindowIcon(QPixmap(":/Resources/error_icon.png"));
-    messageBox.setWindowTitle("Ошибка");
-    messageBox.setText(error);
-    messageBox.setFixedSize(500,200);
-    messageBox.setModal(true);
-    messageBox.exec();
-}
+typedef QMap<QString, QVariant> RowData;
+typedef QVector<RowData> Rows;
+
+void ShowStylizedErrorMessage(const QString& error);
 
 #endif // UTILITIES_H

@@ -29,13 +29,16 @@ SOURCES += \
         login_dialog.cpp \
         main.cpp \
         mainwindow.cpp \
+        projectdetailsdialog.cpp \
         user.cpp \
-        userposition.cpp
+        userposition.cpp \
+        utilities.cpp
 
 HEADERS += \
     db.h \
     login_dialog.h \
     mainwindow.h \
+    projectdetailsdialog.h \
     user.h \
     userposition.h \
     utilities.h

@@ -79,9 +79,9 @@ const User &Db::getCurrentUser() const
     return currentUser;
 }
 
-QVector<QMap<QString, QVariant>> Db::getProjectsData() const
+Rows Db::getProjectsData() const
 {
-    QVector<QMap<QString, QVariant>> result;
+    Rows result;
 
     QSqlQuery query;
     query.prepare("SELECT * FROM projects ORDER BY start_date, title");
@@ -92,15 +92,62 @@ QVector<QMap<QString, QVariant>> Db::getProjectsData() const
     }
 
     while (query.next()) {
-        QMap<QString, QVariant> row;
+        RowData row;
         row["id"] = query.value("id");
         row["title"] = query.value("title");
         row["description"] = query.value("description");
-        row["creation_dt"] = query.value("cration_dt");
+        row["creation_dt"] = query.value("creation_dt");
         row["start_date"] = query.value("start_date");
         row["end_date"] = query.value("end_date");
         result.push_back(row);
     }
+
+    return result;
+}
+
+Rows Db::getTasksData(int id_project) const
+{
+    Rows result;
+
+    QSqlQuery query;
+    query.prepare("SELECT DISTINCT ON (t.id) "
+                  "t.id, t.pid, t.id_project, t.id_worker, t.title, t.description, t.deadline_dt, t.published_dt, "
+                  "s.id as id_status, s.title as status_title, "
+                  "w.fio"
+                  "FROM tasks as t "
+                  "LEFT JOIN tasks_statuses_history as h ON h.id_task = t.id "
+                  "LEFT JOIN statuses as s ON h.id_status = s.id"
+                  "LEFT JOIN department_workers as w ON w.id = t.id_worker"
+                  "ORDER BY h.status_dt DESC");
+    query.bindValue(":id_project", id_project);
+    query.exec();
+
+    if (query.size() == 0) {
+        return result;
+    }
+
+
+    while (query.next()) {
+        RowData row;
+        row["id"] = query.value("id");
+        row["pid"] = query.value("pid");
+        row["id_project"] = query.value("id_project");
+        row["id_worker"] = query.value("id_worker");
+        row["title"] = query.value("title");
+        row["description"] = query.value("description");
+        row["deadline_dt"] = query.value("published_dt");
+        row["id_status"] = query.value("id_status");
+        row["status_title"] = query.value("status_title");
+        row["fio"] = query.value("fio");
+        result.push_back(row);
+    }
+
+    return result;
+}
+
+Rows Db::getCommentsData(int id_task) const
+{
+    Rows result;
 
     return result;
 }
