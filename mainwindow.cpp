@@ -29,8 +29,8 @@ void MainWindow::fillProjectsTable() {
     for (auto row : projectsData) {
         projectsTbl->insertRow(projectsTbl->rowCount());
         projectsTbl->setItem( projectsTbl->rowCount() - 1, 0, new QTableWidgetItem(row["title"].toString()));
-        projectsTbl->setItem( projectsTbl->rowCount() - 1, 1, new QTableWidgetItem(row["title"].toString()));
-        projectsTbl->setItem( projectsTbl->rowCount() - 1, 2, new QTableWidgetItem(row["title"].toString()));
+        projectsTbl->setItem( projectsTbl->rowCount() - 1, 1, new QTableWidgetItem(row["start_date"].toString()));
+        projectsTbl->setItem( projectsTbl->rowCount() - 1, 2, new QTableWidgetItem(row["end_date"].toString()));
     }
 }
 
@@ -59,6 +59,8 @@ void MainWindow::setupGUI()
     projectsTbl->setHorizontalHeaderLabels(QStringList{tr("Название"), tr("Дата начала"), tr("Дата окончания")});
     projectsTbl->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     projectsTbl->horizontalHeader()->setStretchLastSection(true);
+    projectsTbl->setSelectionBehavior(QAbstractItemView::SelectRows);
+    projectsTbl->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     detailsProjectBtn = new QPushButton;
     detailsProjectBtn->setIcon(QPixmap(":/Resources/show_object.png"));
@@ -109,6 +111,8 @@ void MainWindow::setupGUI()
     tasksTree->setHeaderLabels(QStringList{tr("Название"), tr("Ответственный"), tr("Статус"), tr("Дата создания"), tr("Плановое завершение")});
     tasksTree->header()->setSectionResizeMode(QHeaderView::Stretch);
     tasksTree->header()->setStretchLastSection(true);
+    tasksTree->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tasksTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     detailsTaskBtn = new QPushButton;
     detailsTaskBtn->setIcon(QPixmap(":/Resources/show_object.png"));
@@ -162,7 +166,8 @@ void MainWindow::setupGUI()
     commentsTree->setHeaderLabels(QStringList{tr("Тема комментария"), tr("Автор"), tr("Дата создания")});
     commentsTree->header()->setSectionResizeMode(QHeaderView::Stretch);
     commentsTree->header()->setStretchLastSection(true);
-
+    commentsTree->setSelectionBehavior(QAbstractItemView::SelectRows);
+    commentsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     detailsCommentBtn = new QPushButton;
     detailsCommentBtn->setIcon(QPixmap(":/Resources/show_object.png"));
