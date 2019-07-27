@@ -51,7 +51,7 @@ private slots:
 
 protected:
     void fillProjectsTable();
-    void fillTasksTree(const Rows& tasksData);
+    void fillTasksTree(int id_project);
     void fillCommentsTree(const Rows &commentsData);
     void setupProjectsButtons();
 };

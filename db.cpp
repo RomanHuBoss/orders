@@ -113,12 +113,13 @@ Rows Db::getTasksData(int id_project) const
     query.prepare("SELECT DISTINCT ON (t.id) "
                   "t.id, t.pid, t.id_project, t.id_worker, t.title, t.description, t.deadline_dt, t.published_dt, "
                   "s.id as id_status, s.title as status_title, "
-                  "w.fio"
+                  "w.fio "
                   "FROM tasks as t "
-                  "LEFT JOIN tasks_statuses_history as h ON h.id_task = t.id "
-                  "LEFT JOIN statuses as s ON h.id_status = s.id"
-                  "LEFT JOIN department_workers as w ON w.id = t.id_worker"
-                  "ORDER BY h.status_dt DESC");
+                  "LEFT JOIN task_statuses_history as h ON h.id_task = t.id "
+                  "LEFT JOIN statuses as s ON h.id_status = s.id "
+                  "LEFT JOIN department_workers as w ON w.id = t.id_worker "
+                  "WHERE t.id_project = :id_project "
+                  "ORDER BY t.id, h.status_dt DESC ");
     query.bindValue(":id_project", id_project);
     query.exec();
 
@@ -134,8 +135,9 @@ Rows Db::getTasksData(int id_project) const
         row["id_project"] = query.value("id_project");
         row["id_worker"] = query.value("id_worker");
         row["title"] = query.value("title");
-        row["description"] = query.value("description");
-        row["deadline_dt"] = query.value("published_dt");
+        row["description"] = query.value("description");        
+        row["published_dt"] = query.value("published_dt");
+        row["deadline_dt"] = query.value("deadline_dt");
         row["id_status"] = query.value("id_status");
         row["status_title"] = query.value("status_title");
         row["fio"] = query.value("fio");

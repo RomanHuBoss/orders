@@ -8,6 +8,7 @@
 #include <QHeaderView>
 #include <QButtonGroup>
 #include "projectdialog.h"
+#include <algorithm>
 
 MainWindow::MainWindow(Db *db, QWidget * parent) :
     QMainWindow(parent), db(db)
@@ -33,9 +34,10 @@ void MainWindow::fillProjectsTable() {
 
     for (auto row : projectsData) {
         projectsTbl->insertRow(projectsTbl->rowCount());
-        projectsTbl->setItem( projectsTbl->rowCount() - 1, 0, new QTableWidgetItem(row["title"].toString()));
-        projectsTbl->setItem( projectsTbl->rowCount() - 1, 1, new QTableWidgetItem(row["start_date"].toString()));
-        projectsTbl->setItem( projectsTbl->rowCount() - 1, 2, new QTableWidgetItem(row["end_date"].toString()));
+        projectsTbl->setItem( projectsTbl->rowCount() - 1, 0, new QTableWidgetItem(row["id"].toString()));
+        projectsTbl->setItem( projectsTbl->rowCount() - 1, 1, new QTableWidgetItem(row["title"].toString()));
+        projectsTbl->setItem( projectsTbl->rowCount() - 1, 2, new QTableWidgetItem(row["start_date"].toDate().toString()));
+        projectsTbl->setItem( projectsTbl->rowCount() - 1, 3, new QTableWidgetItem(row["end_date"].toDate().toString()));
         projectsTbl->item(projectsTbl->rowCount() - 1, 0)->setData(Qt::UserRole, row);
     }
 
@@ -48,21 +50,58 @@ void MainWindow::fillProjectsTable() {
     setupProjectsButtons();
 }
 
-void MainWindow::fillTasksTree(const Rows &tasksData)
+void MainWindow::fillTasksTree(int id_project)
 {
+    tasksTree->blockSignals(true);
     tasksTree->clear();
 
-    for (auto row : tasksData) {
+    Rows tasksData = db->getTasksData(id_project);
+    while (tasksData.size()) {
+        auto new_end = std::remove_if(tasksData.begin(), tasksData.end(), [&](const RowData& task) {
+            QTreeWidgetItem * parent = nullptr;
+
+            if (!task["pid"].isNull()) {
+                QList<QTreeWidgetItem*> items = tasksTree->findItems(task["pid"].toString(), Qt::MatchFixedString | Qt::MatchContains | Qt::MatchRecursive, 0);
+
+                if (items.size() == 0) {
+                    return false;
+                }
+
+                parent = items[0];
+            }
+
+            QTreeWidgetItem * row = new QTreeWidgetItem;
+            row->setText(0, task["id"].toString());
+            row->setText(1, task["title"].toString());
+            row->setText(2, task["fio"].toString());
+            row->setText(3, task["status_title"].toString());
+            row->setText(4, task["published_dt"].toDate().toString());
+            row->setText(5, task["deadline_dt"].toDate().toString());
+
+            if (parent == nullptr) {
+                tasksTree->addTopLevelItem(row);
+            }
+            else {
+                parent->addChild(row);
+            }
+
+            return true;
+        });
+
+        tasksData.erase(new_end, tasksData.end());
     }
+
+
+    tasksTree->blockSignals(false);
 
 }
 
 void MainWindow::fillCommentsTree(const Rows &commentsData)
 {
-    commentsTree->clear();
 
     for (auto row : commentsData) {
     }
+
 
 }
 
@@ -88,7 +127,7 @@ void MainWindow::setupGUI()
 
     projectsTbl = new QTableWidget;
     projectsTbl->setColumnCount(3);
-    projectsTbl->setHorizontalHeaderLabels(QStringList{tr("Название"), tr("Дата начала"), tr("Дата окончания")});
+    projectsTbl->setHorizontalHeaderLabels(QStringList{tr("id"), tr("Название"), tr("Дата начала"), tr("Дата окончания")});
     projectsTbl->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     projectsTbl->horizontalHeader()->setStretchLastSection(true);
     projectsTbl->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -158,7 +197,7 @@ void MainWindow::setupGUI()
 
     tasksTree = new QTreeWidget;
     tasksTree->setColumnCount(5);
-    tasksTree->setHeaderLabels(QStringList{tr("Название"), tr("Ответственный"), tr("Статус"), tr("Дата создания"), tr("Плановое завершение")});
+    tasksTree->setHeaderLabels(QStringList{tr("id"), tr("Название"), tr("Ответственный"), tr("Статус"), tr("Дата создания"), tr("Плановое завершение")});
     tasksTree->header()->setSectionResizeMode(QHeaderView::Stretch);
     tasksTree->header()->setStretchLastSection(true);
     tasksTree->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -221,7 +260,7 @@ void MainWindow::setupGUI()
 
     commentsTree = new QTreeWidget;
     commentsTree->setColumnCount(3);
-    commentsTree->setHeaderLabels(QStringList{tr("Тема комментария"), tr("Автор"), tr("Дата создания")});
+    commentsTree->setHeaderLabels(QStringList{tr("id"), tr("Тема комментария"), tr("Автор"), tr("Дата создания")});
     commentsTree->header()->setSectionResizeMode(QHeaderView::Stretch);
     commentsTree->header()->setStretchLastSection(true);
     commentsTree->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -314,9 +353,7 @@ void MainWindow::onSelectProject()
 
     Rows tasksData = db->getTasksData(id_project);
 
-    if (tasksData.size() > 0) {
-        //fillTasksTree(tasksData);
-    }
+    fillTasksTree(id_project);
 }
 
 void MainWindow::onShowProjectDetailsDialog()
