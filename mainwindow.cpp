@@ -44,6 +44,8 @@ void MainWindow::fillProjectsTable() {
     if (projectsTbl->rowCount() > 0) {
         projectsTbl->selectRow(0);
     }
+
+    setupProjectsButtons();
 }
 
 void MainWindow::fillTasksTree(const Rows &tasksData)
@@ -286,18 +288,29 @@ MainWindow::~MainWindow()
     delete db;
 }
 
+void MainWindow::setupProjectsButtons() {
+    if (projectsTbl->currentRow() >= 0) {
+        detailsProjectBtn->setDisabled(false);
+        addProjectBtn->setDisabled(!db->getCurrentUser().isHead());
+        editProjectBtn->setDisabled(!db->getCurrentUser().isHead());
+        removeProjectBtn->setDisabled(!db->getCurrentUser().isHead());
+    }
+    else {
+        detailsProjectBtn->setDisabled(true);
+        addProjectBtn->setDisabled(!db->getCurrentUser().isHead());
+        editProjectBtn->setDisabled(true);
+        removeProjectBtn->setDisabled(true);
+    }
+}
+
 void MainWindow::onSelectProject()
 {
-    qDebug() << "current row:" << projectsTbl->currentRow();
-    qDebug() << "row count:" << projectsTbl->rowCount();
-    detailsProjectBtn->setDisabled(false);
-    addProjectBtn->setDisabled(!db->getCurrentUser().isHead());
-    editProjectBtn->setDisabled(!db->getCurrentUser().isHead());
-    removeProjectBtn->setDisabled(!db->getCurrentUser().isHead());
+    int id_project = -1;
 
-    RowData row = qvariant_cast<RowData>(projectsTbl->item(projectsTbl->currentRow(), 0)->data(Qt::UserRole));
-
-    int id_project = row["id"].toInt();
+    if (projectsTbl->currentRow() >= 0) {
+        RowData row = qvariant_cast<RowData>(projectsTbl->item(projectsTbl->currentRow(), 0)->data(Qt::UserRole));
+        id_project = row["id"].toInt();
+    }
 
     Rows tasksData = db->getTasksData(id_project);
 

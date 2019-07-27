@@ -53,6 +53,7 @@ protected:
     void fillProjectsTable();
     void fillTasksTree(const Rows& tasksData);
     void fillCommentsTree(const Rows &commentsData);
+    void setupProjectsButtons();
 };
 
 #endif // MAINWINDOW_H
