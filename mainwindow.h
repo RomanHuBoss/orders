@@ -41,19 +41,36 @@ public:
     ~MainWindow();
 private slots:
     void onSelectProject();
+    void onRefreshProjectsTbl();
     void onShowProjectDetailsDialog();
     void onShowProjectAddDialog();
     void onShowProjectEditDialog();
     void onRemoveProject();
 
+
     void onSelectTask();
-    void onRefreshProjectsTbl();
+    void onRefreshTasksTree();
+    void onShowTaskDetailsDialog();
+    void onShowTaskAddDialog();
+    void onShowSubtaskAddDialog();
+    void onShowTaskEditDialog();
+    void onRemoveTask();
+
+    void onSelectComment();
+    void onRefreshCommentsTree();
+    void onShowCommentDetailsDialog();
+    void onShowCommentAddDialog();
+    void onShowSubcommentAddDialog();
+    void onShowCommentEditDialog();
+    void onRemoveComment();
 
 protected:
     void fillProjectsTable();
-    void fillTasksTree(int id_project);
-    void fillCommentsTree(const Rows &commentsData);
+    void fillTasksTree();
+    void fillCommentsTree();
     void setupProjectsButtons();
+    void setupTasksButtons();
+    void setupCommentsButtons();
 };
 
 #endif // MAINWINDOW_H

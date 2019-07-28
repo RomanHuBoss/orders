@@ -50,10 +50,13 @@ void MainWindow::fillProjectsTable() {
     setupProjectsButtons();
 }
 
-void MainWindow::fillTasksTree(int id_project)
+void MainWindow::fillTasksTree()
 {
     tasksTree->blockSignals(true);
     tasksTree->clear();
+
+    RowData row = qvariant_cast<RowData>(projectsTbl->item(projectsTbl->currentRow(), 0)->data(Qt::UserRole));
+    int id_project = row["id"].toInt();
 
     Rows tasksData = db->getTasksData(id_project);
     while (tasksData.size()) {
@@ -71,6 +74,7 @@ void MainWindow::fillTasksTree(int id_project)
             }
 
             QTreeWidgetItem * row = new QTreeWidgetItem;
+            row->setData(0, Qt::UserRole, task);
             row->setText(0, task["id"].toString());
             row->setText(1, task["title"].toString());
             row->setText(2, task["fio"].toString());
@@ -94,14 +98,16 @@ void MainWindow::fillTasksTree(int id_project)
 
     tasksTree->blockSignals(false);
 
-}
-
-void MainWindow::fillCommentsTree(const Rows &commentsData)
-{
-
-    for (auto row : commentsData) {
+    if (tasksTree->topLevelItemCount() > 0) {
+        tasksTree->setCurrentItem(tasksTree->topLevelItem(0));
     }
 
+    setupTasksButtons();
+
+}
+
+void MainWindow::fillCommentsTree()
+{
 
 }
 
@@ -204,12 +210,16 @@ void MainWindow::setupGUI()
     tasksTree->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     tasksTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    connect(tasksTree, SIGNAL(itemSelectionChanged()), this, SLOT(onSelectTask()));
+
     detailsTaskBtn = new QPushButton;
     detailsTaskBtn->setIcon(QPixmap(":/Resources/show_object.png"));
     detailsTaskBtn->setText(tr("Подробности"));
     detailsTaskBtn->setFlat(true);
     detailsTaskBtn->setIconSize(QSize{24, 24});
     detailsTaskBtn->setDisabled(true);
+
+    connect(detailsTaskBtn, SIGNAL(clicked()), this, SLOT(onShowTaskDetailsDialog()));
 
     addTaskBtn = new QPushButton;
     addTaskBtn->setIcon(QPixmap(":/Resources/add_object.png"));
@@ -218,7 +228,7 @@ void MainWindow::setupGUI()
     addTaskBtn->setIconSize(QSize{24, 24});
     addTaskBtn->setDisabled(true);
 
-
+    connect(addTaskBtn, SIGNAL(clicked()), this, SLOT(onShowTaskAddDialog()));
 
     addSubtaskBtn = new QPushButton;
     addSubtaskBtn->setIcon(QPixmap(":/Resources/add_subobject.png"));
@@ -227,6 +237,8 @@ void MainWindow::setupGUI()
     addSubtaskBtn->setIconSize(QSize{24, 24});
     addSubtaskBtn->setDisabled(true);
 
+    connect(addSubtaskBtn, SIGNAL(clicked()), this, SLOT(onShowSubtaskAddDialog()));
+
     editTaskBtn = new QPushButton;
     editTaskBtn->setIcon(QPixmap(":/Resources/edit_object.png"));
     editTaskBtn->setText(tr("Редактировать"));
@@ -234,12 +246,16 @@ void MainWindow::setupGUI()
     editTaskBtn->setIconSize(QSize{24, 24});
     editTaskBtn->setDisabled(true);
 
+    connect(editTaskBtn, SIGNAL(clicked()), this, SLOT(onShowTaskEditDialog()));
+
     removeTaskBtn = new QPushButton;
     removeTaskBtn->setIcon(QPixmap(":/Resources/remove_object.png"));
     removeTaskBtn->setText(tr("Удалить"));
     removeTaskBtn->setFlat(true);
     removeTaskBtn->setIconSize(QSize{24, 24});
     removeTaskBtn->setDisabled(true);
+
+    connect(removeTaskBtn, SIGNAL(clicked()), this, SLOT(onRemoveTask()));
 
     QHBoxLayout * tasksTreeBtns = new QHBoxLayout;
     tasksTreeBtns->addStretch(1);
@@ -274,12 +290,16 @@ void MainWindow::setupGUI()
     detailsCommentBtn->setIconSize(QSize{24, 24});
     detailsCommentBtn->setDisabled(true);
 
+    connect(detailsCommentBtn, SIGNAL(clicked()), this, SLOT(onShowCommentDetailsDialog()));
+
     addCommentBtn = new QPushButton;
     addCommentBtn->setIcon(QPixmap(":/Resources/add_object.png"));
     addCommentBtn->setText(tr("Добавить комментарий"));
     addCommentBtn->setFlat(true);
     addCommentBtn->setIconSize(QSize{24, 24});
     addCommentBtn->setDisabled(true);
+
+    connect(addCommentBtn, SIGNAL(clicked()), this, SLOT(onShowCommentAddDialog()));
 
     addSubcommentBtn = new QPushButton;
     addSubcommentBtn->setIcon(QPixmap(":/Resources/add_subobject.png"));
@@ -288,6 +308,8 @@ void MainWindow::setupGUI()
     addSubcommentBtn->setIconSize(QSize{24, 24});
     addSubcommentBtn->setDisabled(true);
 
+    connect(addSubcommentBtn, SIGNAL(clicked()), this, SLOT(onShowSubcommentAddDialog()));
+
     editCommentBtn = new QPushButton;
     editCommentBtn->setIcon(QPixmap(":/Resources/edit_object.png"));
     editCommentBtn->setText(tr("Редактировать"));
@@ -295,12 +317,16 @@ void MainWindow::setupGUI()
     editCommentBtn->setIconSize(QSize{24, 24});
     editCommentBtn->setDisabled(true);
 
+    connect(editCommentBtn, SIGNAL(clicked()), this, SLOT(onShowCommentEditDialog()));
+
     removeCommentBtn = new QPushButton;
     removeCommentBtn->setIcon(QPixmap(":/Resources/remove_object.png"));
     removeCommentBtn->setText(tr("Удалить"));
     removeCommentBtn->setFlat(true);
     removeCommentBtn->setIconSize(QSize{24, 24});
     removeCommentBtn->setDisabled(true);
+
+    connect(removeCommentBtn, SIGNAL(clicked()), this, SLOT(onRemoveComment()));
 
     QHBoxLayout * commentsTreeBtns = new QHBoxLayout;
     commentsTreeBtns->addStretch(1);
@@ -327,16 +353,40 @@ MainWindow::~MainWindow()
     delete db;
 }
 
-void MainWindow::setupProjectsButtons() {
+void MainWindow::setupTasksButtons() {
+    if (tasksTree->selectedItems().size() > 0) {
+        RowData row = qvariant_cast<RowData>(tasksTree->selectedItems()[0]->data(0, Qt::UserRole));
+        detailsTaskBtn->setDisabled(false);
+        addTaskBtn->setDisabled(!db->getCurrentUser().isHead());
+        addSubtaskBtn->setDisabled(!db->getCurrentUser().isHead());
+        editTaskBtn->setDisabled(db->getCurrentUser().getId() != row["id_worker"].toInt() && !db->getCurrentUser().isHead());
+        removeTaskBtn->setDisabled(!db->getCurrentUser().isHead());
+    }
+    else {
+        detailsTaskBtn->setDisabled(true);
+        addTaskBtn->setDisabled(!projectsTbl->selectedItems().size() || !db->getCurrentUser().isHead());
+        addSubtaskBtn->setDisabled(true);
+        editTaskBtn->setDisabled(true);
+        removeTaskBtn->setDisabled(true);
+    }
+}
+
+void MainWindow::setupCommentsButtons()
+{
+
+}
+
+void MainWindow::setupProjectsButtons()
+{
+    addProjectBtn->setDisabled(!db->getCurrentUser().isHead());
+
     if (projectsTbl->currentRow() >= 0) {
         detailsProjectBtn->setDisabled(false);
-        addProjectBtn->setDisabled(!db->getCurrentUser().isHead());
         editProjectBtn->setDisabled(!db->getCurrentUser().isHead());
         removeProjectBtn->setDisabled(!db->getCurrentUser().isHead());
     }
     else {
         detailsProjectBtn->setDisabled(true);
-        addProjectBtn->setDisabled(!db->getCurrentUser().isHead());
         editProjectBtn->setDisabled(true);
         removeProjectBtn->setDisabled(true);
     }
@@ -344,16 +394,8 @@ void MainWindow::setupProjectsButtons() {
 
 void MainWindow::onSelectProject()
 {
-    int id_project = -1;
-
-    if (projectsTbl->currentRow() >= 0) {
-        RowData row = qvariant_cast<RowData>(projectsTbl->item(projectsTbl->currentRow(), 0)->data(Qt::UserRole));
-        id_project = row["id"].toInt();
-    }
-
-    Rows tasksData = db->getTasksData(id_project);
-
-    fillTasksTree(id_project);
+    setupProjectsButtons();
+    fillTasksTree();
 }
 
 void MainWindow::onShowProjectDetailsDialog()
@@ -392,18 +434,81 @@ void MainWindow::onRemoveProject()
 
 void MainWindow::onSelectTask()
 {
-
-    commentsTree->clear();
-
-    QList<QTreeWidgetItem *> items = tasksTree->selectedItems();
-    RowData row = qvariant_cast<RowData>(items.at(0)->data(0, Qt::UserRole));
-
-    int id_task = row["id"].toInt();
-
-    Rows commentsData = db->getCommentsData(id_task);
+    setupTasksButtons();
+    fillCommentsTree();
 }
+
+void MainWindow::onSelectComment()
+{
+    setupCommentsButtons();
+}
+
 
 void MainWindow::onRefreshProjectsTbl()
 {
     fillProjectsTable();
+}
+
+
+void MainWindow::onRemoveTask()
+{
+    RowData row = qvariant_cast<RowData>(tasksTree->selectedItems()[0]->data(0, Qt::UserRole));
+    if (db->removeTask(row)) {
+        fillTasksTree();
+    }
+}
+
+void MainWindow::onRefreshTasksTree()
+{
+    fillTasksTree();
+}
+
+void MainWindow::onShowTaskDetailsDialog()
+{
+
+}
+
+void MainWindow::onShowTaskAddDialog()
+{
+
+}
+
+void MainWindow::onShowSubtaskAddDialog()
+{
+
+}
+
+void MainWindow::onShowTaskEditDialog()
+{
+
+}
+
+void MainWindow::onRefreshCommentsTree()
+{
+    fillCommentsTree();
+}
+
+void MainWindow::onShowCommentDetailsDialog()
+{
+
+}
+
+void MainWindow::onShowCommentAddDialog()
+{
+
+}
+
+void MainWindow::onShowSubcommentAddDialog()
+{
+
+}
+
+void MainWindow::onShowCommentEditDialog()
+{
+
+}
+
+void MainWindow::onRemoveComment()
+{
+
 }

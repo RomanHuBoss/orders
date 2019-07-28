@@ -25,6 +25,7 @@ public:
 
     bool saveProjectData(const RowData& row, DIALOG_ACTIONS action) const;
     bool removeProject(const RowData& row) const;
+    bool removeTask(const RowData& row) const;
 };
 
 #endif // DB_H

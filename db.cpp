@@ -193,6 +193,19 @@ bool Db::removeProject(const RowData &row) const
     }
 
 
-    return true;
+    return true;    
+}
 
+bool Db::removeTask(const RowData &row) const
+{
+    QSqlQuery query;
+    query.prepare("DELETE FROM tasks WHERE id = :id");
+    query.bindValue(":id", row["id"].toInt());
+
+    if (!query.exec()) {
+        ShowStylizedErrorMessage("Ошибка удаления задачи");
+        return false;
+    }
+
+    return true;
 }
